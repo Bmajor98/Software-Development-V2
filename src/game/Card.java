@@ -2,7 +2,7 @@ package game;
 
 public class Card {
 
-	private int val;
+	int val;
 	
 	public Card(int val){
 	
