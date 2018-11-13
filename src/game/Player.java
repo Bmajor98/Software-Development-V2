@@ -7,12 +7,12 @@ import java.util.stream.Stream;
 
 public class Player {
 
-	private List<Card> cards = new ArrayList<Card>();
+	List<Card> cards = new ArrayList<Card>();
 	private int name;
 
 	public Player(int name, List<Card> cards ) {
 		this.cards = cards;
-		this.name = name;
+		this.name = name;////-
 	}
 
 	public void Draw() {
