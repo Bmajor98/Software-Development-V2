@@ -62,6 +62,14 @@ public class CardGame {
 		return decks;
 	}
 	
+	public void Draw() {
+		 
+	}
+	 
+	public void Discard() {
+		 
+	}
+	
 	//MAIN METHOD//	
 	public static void main(String[] args) {
 		int n = 4;
