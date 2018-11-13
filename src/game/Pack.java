@@ -38,9 +38,11 @@ public static void checkPack(int n) {
 			
 		} catch(Exception e) {
 			System.out.println("Invalid pack file");
+			System.exit(1);
 		}
 	} catch(Exception e) {
 		System.out.println("Pack file not found");
+		System.exit(1);
 	}
 }
 	

@@ -66,10 +66,15 @@ public class CardGame {
 	public void Draw() {
 		 
 	}
-	 
+	
 	public void Discard() {
 		 
 	}
+	
+	public void hasWon() {
+		
+	}
+	
 	
 	//MAIN METHOD//	
 	public static void main(String[] args) {
