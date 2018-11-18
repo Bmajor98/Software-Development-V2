@@ -11,41 +11,40 @@ public class Pack {
 	public Pack(List<Card> cards) {
 		this.cards = cards;
 
-		
-	
-}
+	}		
 
-private static Scanner x;
-public static void checkPack(int n) {
-	
-	try {
-		x = new Scanner(new File("pack.txt"));
-		int cardCount = 0;
+	private static Scanner x;
+	public static void checkPack(int n) {
+		
 		try {
-			while (x.hasNext()) {
-				int a = Integer.parseInt(x.nextLine());
-				if (a > 0) {
-					cardCount ++;
+			x = new Scanner(new File("pack.txt"));
+			int cardCount = 0;
+			try {
+				while (x.hasNext()) {
+					int a = Integer.parseInt(x.nextLine());
+					if (a > 0) {
+						cardCount ++;
+					} else {
+						throw new Exception();
+					}
+				}
+				if (cardCount / n == 8) {
+					System.out.println("File is okay, pack contains " + cardCount + " cards");
 				} else {
 					throw new Exception();
 				}
+				
+			} catch(Exception e) {
+				System.out.println("Invalid pack file");
+				System.exit(1);
 			}
-			if (cardCount / n == 8) {
-				System.out.println("File is okay, pack contains " + cardCount + " cards");
-			} else {
-				throw new Exception();
-			}
-			
 		} catch(Exception e) {
-			System.out.println("Invalid pack file");
+			System.out.println("Pack file not found");
 			System.exit(1);
 		}
-	} catch(Exception e) {
-		System.out.println("Pack file not found");
-		System.exit(1);
-	}
-}
 	
+	}
+}	
 	
 //	public static CardsPack Generate(int n, Pack pack){
 //		List<List<Card>> cards = new ArrayList<List<Card>>();
@@ -65,5 +64,5 @@ public static void checkPack(int n) {
 //		return cardsPack;
 //	}
 		
-	}
+
 
