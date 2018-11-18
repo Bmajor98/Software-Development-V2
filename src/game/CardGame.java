@@ -1,6 +1,7 @@
 package game;
 
 import java.util.*;
+import java.io.*;
 
 public class CardGame {
 
@@ -20,89 +21,59 @@ public class CardGame {
 	}
 
 	//DEAL PLAYER//
-	public static List<DeckPlayer> Deal(int n, Pack pack) {
+	public static List<DeckPlayer> deal(int n, Pack pack) throws IOException {
 		List<DeckPlayer> deckPlayers = new ArrayList<DeckPlayer>();
 		for(int i =1; i<=n; i++) {
 			List<Card> playerCards = new ArrayList<Card>();
 			List<Card> deckCards = new ArrayList<Card>();
 			DeckPlayer deckPlayer = new DeckPlayer(i,playerCards,deckCards);
 			deckPlayers.add(deckPlayer);
+			String filename = "player_"+i+".txt";
+			PrintWriter writer = new PrintWriter(filename);
+			
+			
 		}
-		for(int i = 1; i<= n; i++)
+		for(int i = 1; i<= n; i++) {
 			for(DeckPlayer d: deckPlayers) {
 				Card top = pack.cards.get(0);
 				d.playerCards.add(top);
 				pack.cards.remove(0);
 				
-			}
-		for(int i = 1; i<= n; i++)
+			}	
+		}
+		for(DeckPlayer d: deckPlayers) {
+			String filename = "player_"+d.name+".txt";
+			try{
+					FileWriter fw = new FileWriter(filename, true);
+					BufferedWriter bw = new BufferedWriter(fw);
+					
+					
+						int card1= d.playerCards.get(0).val;
+						int card2 = d.playerCards.get(1).val;;
+						int card3 = d.playerCards.get(2).val;;
+						int card4 = d.playerCards.get(3).val;;
+								
+						String initial = "player "+d.name+" initial hand "+" "+card1+" "+card2+" "+card3+" "+card4;
+						bw.write(initial);
+						bw.close();
+					} 
+		
+					catch(IOException e) {
+						
+					}
+					
+		}
+		for(int i = 1; i<= n; i++) {
 			for(DeckPlayer d: deckPlayers) {
 				Card top = pack.cards.get(0);
 				d.deckCards.add(top);
 				pack.cards.remove(0);
 				
 			}
+		}
 		return deckPlayers;		
 			
 	}
-
-
-	public static List<DeckPlayer> Draw(int name, List<DeckPlayer> deckPlayers) {
-		int listIndex = name -1;
-		DeckPlayer drawPlayer = deckPlayers.get(listIndex);
-		Card topDeck = deckPlayers.get(listIndex).deckCards.get(0);
-		drawPlayer.playerCards.add(topDeck);
-		drawPlayer.deckCards.remove(0);
-		deckPlayers.set(listIndex, drawPlayer);	
-		return deckPlayers;
-
-	}
-	
-	public static int Choose(DeckPlayer dP) {
-		Random rand = new Random();
-		boolean t = true;
-		int index = 0;
-		while(t) {
-			index = rand.nextInt(4);
-			if(dP.playerCards.get(index).val != dP.name) {
-				t = false;
-	
-			}
-		}
-		return index;
-	}
-	
-	public static List<DeckPlayer> Discard(int name, List<DeckPlayer> deckPlayers) {
-		int listIndex = name -1;
-		
-		DeckPlayer discardPlayer = deckPlayers.get(listIndex);
-		Random rand = new Random();
-		List<Card> playerCards = discardPlayer.playerCards;
-		boolean t = true;
-		int index = 0;
-		while(t) {
-			index = rand.nextInt(4);
-			if(playerCards.get(0).val != name) {
-				t = false;
-			}
-		}
-		Card discardCard = discardPlayer.playerCards.get(index);
-		discardPlayer.playerCards.remove(index);
-		deckPlayers.set(listIndex, discardPlayer);
-		
-		if(name == deckPlayers.size()) {
-			DeckPlayer gainCard = deckPlayers.get(0);
-			gainCard.deckCards.add(discardCard);
-			deckPlayers.set(0, gainCard);
-			
-		} else {
-			DeckPlayer gainCard = deckPlayers.get(listIndex + 1);
-			gainCard.deckCards.add(discardCard);
-			deckPlayers.set(listIndex +1, gainCard);		
-		}
-		return deckPlayers;
-	}
-
 
 	
 
@@ -112,14 +83,14 @@ public class CardGame {
 
 
 	//MAIN METHOD//
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		System.out.printf("Enter number of players: ");
 		Scanner scanner = new Scanner(System.in);
 		int n = scanner.nextInt();
 		scanner.close();
 		Pack.checkPack(n);
 		Pack pack = GeneratePack(n);
-		List<DeckPlayer> l = Deal(n, pack);
+		List<DeckPlayer> l = deal(n, pack);
 			
 	
 		
@@ -138,26 +109,16 @@ public class CardGame {
 		
 			}
 		}
-		l = Discard(3,l);
-		for(DeckPlayer p: l) {
-			System.out.println();
-			System.out.print("PLAYER "+p.name+": ");
-			for(Card c:p.playerCards) {
-				System.out.print(" "+c.val+",");
-				
+		Thread t1 = new Thread(new CardThread(1,l));
+		Thread t2 = new Thread(new CardThread(2,l));
+		Thread t3 = new Thread(new CardThread(3,l));
+		Thread t4 = new Thread(new CardThread(4,l));
 		
-			}
-			System.out.print("\n"+"Deck "+p.name+": ");
-			for(Card c:p.deckCards) {
-				System.out.print(" "+c.val+",");
-				
+		t1.start();
+		t2.start();
+		t3.start();
+		t4.start();
 		
-			}
-		}
-			
-
-	}
-	
 //	public static boolean Check(Player player) {
 //		List<Integer> hand = new ArrayList<Integer>();
 //		for(Card card: player.cards) {
@@ -170,4 +131,5 @@ public class CardGame {
 //		return false;
 //			
 
+		}
 	}
