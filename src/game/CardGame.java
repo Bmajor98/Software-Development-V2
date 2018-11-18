@@ -106,8 +106,7 @@ public class CardGame {
 				System.out.print(" "+c.val+",");
 			}
 		}
-<<<<<<< HEAD
-		
+
 		List<DeckPlayer> deckPlayerList = new ArrayList<DeckPlayer>();
 		for(int i = 0; i <= n-1; i++) {
 			Deck deck = decks.get(i) ;
@@ -117,7 +116,6 @@ public class CardGame {
 		}
 		DeckPlayer dp = Draw(deckPlayerList.get(0));
 		for(Card c: dp.get(0.));
-=======
->>>>>>> b16c1d16367f9fdc9c01890ee8751117aa1f1f2d
+
 	}	
 }
