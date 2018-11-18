@@ -3,6 +3,7 @@ package game;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 
 public class CardGame {
 	
@@ -69,14 +70,23 @@ public class CardGame {
 		return dP;
 	 
 	}
-	 
+	
 	public void Discard() {
 		 
 	}
 	
+	public void hasWon() {
+		
+	}
+	
+	
 	//MAIN METHOD//	
 	public static void main(String[] args) {
-		int n = 4;
+		System.out.printf("Enter number of players: ");
+		Scanner scanner = new Scanner(System.in);
+		int n = scanner.nextInt(); 
+		scanner.close();
+		Pack.checkPack(n);
 		Pack pack = GeneratePack(n);
 		PlayerPack pP = DealPlayer(n,pack);
 		List<Player> players = pP.players;
@@ -96,6 +106,7 @@ public class CardGame {
 				System.out.print(" "+c.val+",");
 			}
 		}
+<<<<<<< HEAD
 		
 		List<DeckPlayer> deckPlayerList = new ArrayList<DeckPlayer>();
 		for(int i = 0; i <= n-1; i++) {
@@ -106,5 +117,7 @@ public class CardGame {
 		}
 		DeckPlayer dp = Draw(deckPlayerList.get(0));
 		for(Card c: dp.get(0.));
+=======
+>>>>>>> b16c1d16367f9fdc9c01890ee8751117aa1f1f2d
 	}	
 }
