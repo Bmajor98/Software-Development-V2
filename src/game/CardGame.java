@@ -90,7 +90,7 @@ public class CardGame {
 		scanner.close();
 		Pack.checkPack(n);
 		Pack pack = GeneratePack(n);
-		List<DeckPlayer> l = deal(n, pack);
+		List<DeckPlayer> l =Collections.synchronizedList( deal(n, pack));
 			
 	
 		

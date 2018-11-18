@@ -6,14 +6,14 @@ import java.util.*;
 
 public class CardThread implements Runnable {
 	int name;
-	List<DeckPlayer> l = new ArrayList<DeckPlayer>();
+	volatile List<DeckPlayer> l = new ArrayList<DeckPlayer>();
 	
 	CardThread(int name,List<DeckPlayer> l){
 		this.name = name;
 		this.l = l;
 	}
 	
-	private static List<DeckPlayer> draw(int name, List<DeckPlayer> deckPlayers) {
+	public static List<DeckPlayer> draw(int name, List<DeckPlayer> deckPlayers) {
 		int listIndex = name -1;
 		DeckPlayer drawPlayer = deckPlayers.get(listIndex);
 		Card topDeck = deckPlayers.get(listIndex).deckCards.get(0);
@@ -40,7 +40,7 @@ public class CardThread implements Runnable {
 
 	}
 	
-	private static List<DeckPlayer> discard(int name, List<DeckPlayer> deckPlayers) {
+	public static List<DeckPlayer> discard(int name, List<DeckPlayer> deckPlayers) {
 		int listIndex = name -1;
 		
 		DeckPlayer discardPlayer = deckPlayers.get(listIndex);
@@ -50,7 +50,7 @@ public class CardThread implements Runnable {
 		int index = 0;
 		while(t) {
 			index = rand.nextInt(4);
-			if(playerCards.get(0).val != name) {
+			if(playerCards.get(index).val != name) {
 				t = false;
 			}
 		}
@@ -74,8 +74,13 @@ public class CardThread implements Runnable {
 			FileWriter fw = new FileWriter(filename, true);
 			BufferedWriter bw = new BufferedWriter(fw);
 			int card = discardCard.val;
-			
-			String draw = "player "+name+ " discards a "+card+" to deck "+(name+1);
+			int discard;
+			if(name == deckPlayers.size()) {
+				discard = 1;
+			} else {
+				discard = name +1;
+			}
+			String draw = "player "+name+ " discards a "+card+" to deck "+(discard);
 			bw.newLine();
 			bw.write(draw);
 			bw.newLine();
@@ -84,37 +89,42 @@ public class CardThread implements Runnable {
 		} catch(IOException e) {}
 		return deckPlayers;
 	}
-	public static void currentHand(DeckPlayer dP){
+	public static  void currentHand(DeckPlayer dP){
 		String filename = "player_"+dP.name+".txt";
 		try {
 			FileWriter fw = new FileWriter(filename, true);
 			BufferedWriter bw = new BufferedWriter(fw);
 			
-			int card1= dP.playerCards.get(0).val;
-			int card2 = dP.playerCards.get(1).val;;
-			int card3 = dP.playerCards.get(2).val;;
-			int card4 = dP.playerCards.get(3).val;;
+			int card1 = dP.playerCards.get(0).val;
+			int card2 = dP.playerCards.get(1).val;
+			int card3 = dP.playerCards.get(2).val;
+			int card4 = dP.playerCards.get(3).val;
 					
 			String currentHand = "player "+dP.name+" current hand "+" "+card1+" "+card2+" "+card3+" "+card4;
-			bw.newLine();
 			bw.write(currentHand);
+			bw.newLine();
 			bw.close();
 		}catch(IOException e){}
 	}
 	
-	synchronized static List<DeckPlayer> turn(int name, List<DeckPlayer> deckPlayers) {
+	 private  static List<DeckPlayer> turn(int name, List<DeckPlayer> deckPlayers) {
 		deckPlayers = draw(name, deckPlayers);
 		deckPlayers = discard(name,deckPlayers);
+		currentHand(deckPlayers.get(name-1));
 		return deckPlayers;
 		
 		
 	}
 
 	public void run(){
-		synchronized try {
-			for(int i = 0; i<=5; i++) {
-				{turn(name,l);}
-			}
+		try {		
+				
+					for(int i =0; i<=5; i++) {
+						synchronized(l){turn(name,l);}
+						
+					}
+				
+		
 		}catch(Exception e) {}
 		
 	}
