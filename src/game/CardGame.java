@@ -1,9 +1,6 @@
 package game;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class CardGame {
 
@@ -23,57 +20,64 @@ public class CardGame {
 	}
 
 	//DEAL PLAYER//
-	public static PlayerPack DealPlayer(int n, Pack pack) {
-		List<Player> players = new ArrayList<Player>();
-
-		for(int i = 1; i <= n; i++) {
-			List<Card> cards = new ArrayList<Card>();
-			Player p = new Player(i,cards);
-			players.add(p);
+	public static List<DeckPlayer> Deal(int n, Pack pack) {
+		List<DeckPlayer> deckPlayers = new ArrayList<DeckPlayer>();
+		for(int i =1; i<=n; i++) {
+			List<Card> playerCards = new ArrayList<Card>();
+			List<Card> deckCards = new ArrayList<Card>();
+			DeckPlayer deckPlayer = new DeckPlayer(i,playerCards,deckCards);
+			deckPlayers.add(deckPlayer);
 		}
-
-		for(int i = 1; i <= n ; i++) {
-			for(Player p: players) {
+		for(int i = 1; i<= n; i++)
+			for(DeckPlayer d: deckPlayers) {
 				Card top = pack.cards.get(0);
-				p.cards.add(top);
+				d.playerCards.add(top);
 				pack.cards.remove(0);
+				
 			}
-		}
-		PlayerPack pP = new PlayerPack(players, pack);
-		return pP;
+		for(int i = 1; i<= n; i++)
+			for(DeckPlayer d: deckPlayers) {
+				Card top = pack.cards.get(0);
+				d.deckCards.add(top);
+				pack.cards.remove(0);
+				
+			}
+		return deckPlayers;		
+			
 	}
 
-	//DEAL DECK//
-	public static List<Deck> DealDeck(int n, Pack pack) {
-		List<Deck> decks = new ArrayList<Deck>();
-
-		for(int i = 1; i <= n; i++) {
-			List<Card> cards = new ArrayList<Card>();
-			Deck d = new Deck(i,cards);
-			decks.add(d);
-		}
-
-		for(int i = 1; i <= n ; i++) {
-			for(Deck d: decks) {
-				Card top = pack.cards.get(0);
-				d.cards.add(top);
-				pack.cards.remove(0);
-			}
-		}
-		return decks;
-	}
 
 	public static DeckPlayer Draw(DeckPlayer dP) {
-		Card topDeck = dP.deck.cards.get(0);
-		dP.player.cards.add(topDeck);
-		dP.deck.cards.remove(0);
+		Card topDeck = dP.deckCards.get(0);
+		dP.playerCards.add(topDeck);
+		dP.deckCards.remove(0);
 		return dP;
 
 	}
-
-	public void Discard() {
-
+	
+	public static int Choose(DeckPlayer dP) {
+		Random rand = new Random();
+		boolean t = true;
+		int index = 0;
+		while(t) {
+			index = rand.nextInt(4);
+			if(dP.playerCards.get(index).val == dP.name) {
+				t = false;
+	
+			}
+		}
+		System.out.print(index);
+		return index;
 	}
+	
+	public static DeckPlayer Discard(int index, DeckPlayer dP) {
+		dP.playerCards.remove(index);
+		return dP;
+	
+	}
+
+
+	
 
 	public void hasWon() {
 
@@ -88,24 +92,34 @@ public class CardGame {
 		scanner.close();
 		Pack.checkPack(n);
 		Pack pack = GeneratePack(n);
-		PlayerPack pP = DealPlayer(n,pack);
-		List<Player> players = pP.players;
-		List<Deck> decks = DealDeck(n,pP.pack);
+		List<DeckPlayer> l = Deal(n, pack);
+		
 
-		for(Player p: players) {
+		for(DeckPlayer p: l) {
 			System.out.println();
 			System.out.print("PLAYER "+p.name+": ");
-			for(Card c:p.cards) {
+			for(Card c:p.playerCards) {
 				System.out.print(" "+c.val+",");
-			}
+				
+		
 		}
-		for(Deck d: decks) {
-			System.out.println();
-			System.out.print("DECK "+d.name+": ");
-			for(Card c:d.cards) {
-				System.out.print(" "+c.val+",");
-			}
-		}
+		int index = Choose(l.get(0));
 
 	}
-}
+		
+
+	}
+	
+//	public static boolean Check(Player player) {
+//		List<Integer> hand = new ArrayList<Integer>();
+//		for(Card card: player.cards) {
+//			hand.add(card.val);
+//		}		
+//		Stream<Integer> values = hand.stream();
+//		if(values.distinct().count() ==1) {
+//			return true;
+//		}
+//		return false;
+//			
+
+	}
