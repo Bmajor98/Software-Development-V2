@@ -15,6 +15,13 @@ public class Player {
 		this.name = name;
 	}
 
+	public void Draw() {
+		 
+	 }
+	 
+	public void Discard() {
+		 
+	 }
 	
 	
 	public static boolean Check(Player player) {

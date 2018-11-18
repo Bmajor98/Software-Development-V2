@@ -62,8 +62,12 @@ public class CardGame {
 		return decks;
 	}
 	
-	public void Draw() {
-		 
+	public static DeckPlayer Draw(DeckPlayer dP) {
+		Card topDeck = dP.deck.cards.get(0);
+		dP.player.cards.add(topDeck);
+		dP.deck.cards.remove(0);
+		return dP;
+	 
 	}
 	 
 	public void Discard() {
@@ -91,6 +95,16 @@ public class CardGame {
 			for(Card c:d.cards) {
 				System.out.print(" "+c.val+",");
 			}
-		}		
+		}
+		
+		List<DeckPlayer> deckPlayerList = new ArrayList<DeckPlayer>();
+		for(int i = 0; i <= n-1; i++) {
+			Deck deck = decks.get(i) ;
+			Player player = players.get(i);	
+			DeckPlayer dp = new DeckPlayer(deck,player);
+			deckPlayerList.add(dp);
+		}
+		DeckPlayer dp = Draw(deckPlayerList.get(0));
+		for(Card c: dp.get(0.));
 	}	
 }
