@@ -34,7 +34,7 @@ import java.util.*;
 	}
 	
 	
-	private synchronized void printer(int name,List<Integer> l) {
+	private static synchronized void printer(int name,List<Integer> l) {
 		System.out.print("\n"+"PLAYER "+name+":");
 		for(int i:l) {
 			System.out.print(" "+i+",");
@@ -51,4 +51,3 @@ import java.util.*;
 	}
 		
 }
-	
