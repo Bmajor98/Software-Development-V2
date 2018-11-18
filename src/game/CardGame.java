@@ -72,9 +72,20 @@ public class CardGame {
 		return index;
 	}
 	
-	public static List<DeckPlayer> Discard(int index, int name, List<DeckPlayer> deckPlayers) {
+	public static List<DeckPlayer> Discard(int name, List<DeckPlayer> deckPlayers) {
 		int listIndex = name -1;
+		
 		DeckPlayer discardPlayer = deckPlayers.get(listIndex);
+		Random rand = new Random();
+		List<Card> playerCards = discardPlayer.playerCards;
+		boolean t = true;
+		int index = 0;
+		while(t) {
+			index = rand.nextInt(4);
+			if(playerCards.get(0).val != name) {
+				t = false;
+			}
+		}
 		Card discardCard = discardPlayer.playerCards.get(index);
 		discardPlayer.playerCards.remove(index);
 		deckPlayers.set(listIndex, discardPlayer);
@@ -87,12 +98,9 @@ public class CardGame {
 		} else {
 			DeckPlayer gainCard = deckPlayers.get(listIndex + 1);
 			gainCard.deckCards.add(discardCard);
-			deckPlayers.set(listIndex +1, gainCard);
-			
+			deckPlayers.set(listIndex +1, gainCard);		
 		}
-	
 		return deckPlayers;
-	
 	}
 
 
@@ -112,8 +120,9 @@ public class CardGame {
 		Pack.checkPack(n);
 		Pack pack = GeneratePack(n);
 		List<DeckPlayer> l = Deal(n, pack);
+			
+	
 		
-
 		for(DeckPlayer p: l) {
 			System.out.println();
 			System.out.print("PLAYER "+p.name+": ");
@@ -122,11 +131,30 @@ public class CardGame {
 				
 		
 			}
+			System.out.print("\n"+"Deck "+p.name+": ");
+			for(Card c:p.deckCards) {
+				System.out.print(" "+c.val+",");
+				
+		
+			}
 		}
+		l = Discard(3,l);
+		for(DeckPlayer p: l) {
+			System.out.println();
+			System.out.print("PLAYER "+p.name+": ");
+			for(Card c:p.playerCards) {
+				System.out.print(" "+c.val+",");
+				
 		
+			}
+			System.out.print("\n"+"Deck "+p.name+": ");
+			for(Card c:p.deckCards) {
+				System.out.print(" "+c.val+",");
+				
 		
-		
-		
+			}
+		}
+			
 
 	}
 	
