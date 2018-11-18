@@ -102,5 +102,6 @@ public class CardGame {
 				System.out.print(" "+c.val+",");
 			}
 		}
+		
 	}	
 }
