@@ -47,11 +47,14 @@ public class CardGame {
 	}
 
 
-	public static DeckPlayer Draw(DeckPlayer dP) {
-		Card topDeck = dP.deckCards.get(0);
-		dP.playerCards.add(topDeck);
-		dP.deckCards.remove(0);
-		return dP;
+	public static List<DeckPlayer> Draw(int name, List<DeckPlayer> deckPlayers) {
+		int listIndex = name -1;
+		DeckPlayer drawPlayer = deckPlayers.get(listIndex);
+		Card topDeck = deckPlayers.get(listIndex).deckCards.get(0);
+		drawPlayer.playerCards.add(topDeck);
+		drawPlayer.deckCards.remove(0);
+		deckPlayers.set(listIndex, drawPlayer);	
+		return deckPlayers;
 
 	}
 	
@@ -61,18 +64,34 @@ public class CardGame {
 		int index = 0;
 		while(t) {
 			index = rand.nextInt(4);
-			if(dP.playerCards.get(index).val == dP.name) {
+			if(dP.playerCards.get(index).val != dP.name) {
 				t = false;
 	
 			}
 		}
-		System.out.print(index);
 		return index;
 	}
 	
-	public static DeckPlayer Discard(int index, DeckPlayer dP) {
-		dP.playerCards.remove(index);
-		return dP;
+	public static List<DeckPlayer> Discard(int index, int name, List<DeckPlayer> deckPlayers) {
+		int listIndex = name -1;
+		DeckPlayer discardPlayer = deckPlayers.get(listIndex);
+		Card discardCard = discardPlayer.playerCards.get(index);
+		discardPlayer.playerCards.remove(index);
+		deckPlayers.set(listIndex, discardPlayer);
+		
+		if(name == deckPlayers.size()) {
+			DeckPlayer gainCard = deckPlayers.get(0);
+			gainCard.deckCards.add(discardCard);
+			deckPlayers.set(0, gainCard);
+			
+		} else {
+			DeckPlayer gainCard = deckPlayers.get(listIndex + 1);
+			gainCard.deckCards.add(discardCard);
+			deckPlayers.set(listIndex +1, gainCard);
+			
+		}
+	
+		return deckPlayers;
 	
 	}
 
@@ -102,10 +121,11 @@ public class CardGame {
 				System.out.print(" "+c.val+",");
 				
 		
+			}
 		}
-		int index = Choose(l.get(0));
-
-	}
+		
+		
+		
 		
 
 	}
