@@ -1,3 +1,11 @@
+/**
+ * This class contains the methods that threads will use to play the game. All
+ * of these methods are static and all return a list of players. This list is mutable 
+ * and is accessed by multiple threads, therefore action on the list is synchronized.
+ * This class also defines the thread objects that play the game. These will continue to play
+ * until a thread has won. The flag used is a volatile list. Threads add a true variable to the list
+ * if they win. This change in list alerts the other threads to stop.
+ */
 package game;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -6,20 +14,36 @@ import java.util.*;
 
 public class CardThread implements Runnable {
 	int name;
-	volatile List<DeckPlayer> l = new ArrayList<DeckPlayer>();
+	volatile List<Player> l = new ArrayList<Player>();
+	List<Boolean> halter = new ArrayList<Boolean>();
+	private volatile boolean flag = true;
 	
-	CardThread(int name,List<DeckPlayer> l){
+	CardThread(int name,List<Player> l,List<Boolean> halter){
 		this.name = name;
 		this.l = l;
+		this.halter = halter;
 	}
 	
-	public static List<DeckPlayer> draw(int name, List<DeckPlayer> deckPlayers) {
+	/**
+	 * This method is used by threads to draw a card. Using the corresponding player object
+	 * in the list with the same name as the thread, it takes a card from the Player's deck (deckCards)
+	 * and adds it to the Player's hand (playerCards). In addition this method writes to the Player's corresponding
+	 * .txt file what happened in the draw move.
+	 * @param name the thread name
+	 * 
+	 * @param players shared list of players
+	 * @return list of players
+	 */
+	public static List<Player> draw(int name, List<Player> players) {
 		int listIndex = name -1;
-		DeckPlayer drawPlayer = deckPlayers.get(listIndex);
-		Card topDeck = deckPlayers.get(listIndex).deckCards.get(0);
-		drawPlayer.playerCards.add(topDeck);
-		drawPlayer.deckCards.remove(0);
-		deckPlayers.set(listIndex, drawPlayer);	
+		Player drawPlayer = players.get(listIndex);
+		Card topDeck = players.get(listIndex).deckCards.get(0);
+		if(topDeck != null) {
+			
+			drawPlayer.playerCards.add(topDeck);
+			drawPlayer.deckCards.remove(0);
+			players.set(listIndex, drawPlayer);	
+		}
 		
 		String filename = "player_"+name+".txt";
 		try {
@@ -32,18 +56,29 @@ public class CardThread implements Runnable {
 			bw.write(draw);
 			bw.close();
 			
-		} catch(IOException e) {
+			} catch(IOException e) {
 			
-		}
+			}
 		
-		return deckPlayers;
-
-	}
+		return players;
+		}
 	
-	public static List<DeckPlayer> discard(int name, List<DeckPlayer> deckPlayers) {
+	/**
+	 * This method is used by threads to discard a card. Using  Using the corresponding player object
+	 * in the list with the same name as the thread, it takes a card from the Player's hand (playerCards)
+	 * and adds it to the next Player's deck(deckCards). The Player receiving the card is the player with 
+	 * the name 1 higher than the discarding player, or if the discarding player has the highest name, the 
+	 * receiving player is the player with the lowest name. In addition this method writes to the Player's corresponding
+	 * .txt file what happened in the discard move.
+	 * 
+	 * @param name the thread name
+	 * @param players shared list of players
+	 * @return list of players
+	 */
+	public static List<Player> discard(int name, List<Player> players) {
 		int listIndex = name -1;
 		
-		DeckPlayer discardPlayer = deckPlayers.get(listIndex);
+		Player discardPlayer = players.get(listIndex);
 		Random rand = new Random();
 		List<Card> playerCards = discardPlayer.playerCards;
 		boolean t = true;
@@ -56,17 +91,18 @@ public class CardThread implements Runnable {
 		}
 		Card discardCard = discardPlayer.playerCards.get(index);
 		discardPlayer.playerCards.remove(index);
-		deckPlayers.set(listIndex, discardPlayer);
+		players.set(listIndex, discardPlayer);
 		
-		if(name == deckPlayers.size()) {
-			DeckPlayer gainCard = deckPlayers.get(0);
+		if(name == players.size()) {
+			Player gainCard = players.get(0);
 			gainCard.deckCards.add(discardCard);
-			deckPlayers.set(0, gainCard);
+			players.set(0, gainCard);
 			
 		} else {
-			DeckPlayer gainCard = deckPlayers.get(listIndex + 1);
+			Player gainCard = players.get(listIndex + 1);
 			gainCard.deckCards.add(discardCard);
-			deckPlayers.set(listIndex +1, gainCard);		
+			players.set(listIndex +1, gainCard);	
+
 		}
 		
 		String filename  = "player_"+name+".txt";
@@ -75,7 +111,7 @@ public class CardThread implements Runnable {
 			BufferedWriter bw = new BufferedWriter(fw);
 			int card = discardCard.val;
 			int discard;
-			if(name == deckPlayers.size()) {
+			if(name == players.size()) {
 				discard = 1;
 			} else {
 				discard = name +1;
@@ -86,56 +122,118 @@ public class CardThread implements Runnable {
 			bw.newLine();
 			bw.close();
 			
-		} catch(IOException e) {}
-		return deckPlayers;
-	}
-	public static  void currentHand(DeckPlayer dP){
-		String filename = "player_"+dP.name+".txt";
+			} catch(IOException e) {}
+		return players;
+		}
+	
+	/**
+	 * This method writes the Player's current hand to the Player's corresponding .txt file.
+	 * 
+	 * @param player the player whose hand is being written to the file.
+	 */
+	public synchronized static  void currentHand(Player player){
+		String filename = "player_"+player.name+".txt";
 		try {
 			FileWriter fw = new FileWriter(filename, true);
 			BufferedWriter bw = new BufferedWriter(fw);
 			
-			int card1 = dP.playerCards.get(0).val;
-			int card2 = dP.playerCards.get(1).val;
-			int card3 = dP.playerCards.get(2).val;
-			int card4 = dP.playerCards.get(3).val;
+			int card1 = player.playerCards.get(0).val;
+			int card2 = player.playerCards.get(1).val;
+			int card3 = player.playerCards.get(2).val;
+			int card4 = player.playerCards.get(3).val;
 					
-			String currentHand = "player "+dP.name+" current hand "+" "+card1+" "+card2+" "+card3+" "+card4;
+			String currentHand = "player "+player.name+" current hand "+" "+card1+" "+card2+" "+card3+" "+card4;
 			bw.write(currentHand);
 			bw.newLine();
 			bw.close();
 		}catch(IOException e){}
 	}
 	
-	 private  static  List<DeckPlayer> turn(int name, List<DeckPlayer> deckPlayers) {
-		deckPlayers = draw(name, deckPlayers);
-		deckPlayers = discard(name,deckPlayers);
-		currentHand(deckPlayers.get(name-1));
-		return deckPlayers;
+	/**
+	 * This method writes the Player's current deck to the Player's corresponding .txt file.
+	 * 
+	 * @param player the player whose deck is being written to the file. 
+	 */
+	public synchronized static  void currentDeck(Player player){
+		String filename = "player_"+player.name+".txt";
+		try {
+			FileWriter fw = new FileWriter(filename, true);
+			BufferedWriter bw = new BufferedWriter(fw);
+			
+			int card1 = player.deckCards.get(0).val;
+			int card2 = player.deckCards.get(1).val;
+			int card3 = player.deckCards.get(2).val;
+			int card4 = player.deckCards.get(3).val;
+					
+			String currentHand = "player "+player.name+" deck "+" "+card1+" "+card2+" "+card3+" "+card4;
+			bw.write(currentHand);
+			bw.newLine();
+			bw.close();
+		}catch(IOException e){}
+	}
+	
+	/**
+	 * This method combines the draw,discard and currentHand method into a single synchronized
+	 * static method so that drawing and discarding behaves as an atomic action.
+	 * 
+	 * @param name the thread name
+	 * @param players
+	 * @return players shared list of players
+	 */
+	 private  synchronized static  List<Player> turn(int name, List<Player> players) {
+		players = draw(name, players);
+		players = discard(name,players);
+		currentHand(players.get(name-1));
+		return players;
 	 }
-	synchronized public static boolean check(int name,List<DeckPlayer> dP) {
+	synchronized public static boolean check(int name,List<Player> dP) {
 		
 		List<Card> hand = dP.get(name-1).playerCards;
 		boolean allEqual = hand.stream().distinct().limit(2).count() <= 1;
 		return allEqual;
-		
-	}
-		
-		
+		}
 	
+	public void stopRunning() {
+		flag = false;
+	}
 
+	/**
+	 * The run method is what the thread players execute. While no player has won each
+	 * thread will continue to take turns - executing the turn method. When a thread has won
+	 * the flag - List<Boolean> - has a true variable added to it. All threads cease commencing their 
+	 * turns and the winner has his winning hand written to his corresponding .txt file. 
+	 */
 	public void run(){
 		try {		
-			synchronized(l){
-				for(int i =0; i < 1000; i++) {
+			synchronized(l) {
+			
+				while(!check(name,l)) {
+		 {
 					turn(name,l);
+					check(name,l);
+					if(check(name,l)) {
+						currentDeck(l.get(name-1));
+						halter.add(true);
+						String filename = "player_"+name+".txt";
+						FileWriter fw =new FileWriter(filename);
+						BufferedWriter bw = new BufferedWriter(fw);
+						bw.newLine();
+						bw.write("Player "+name+" wins");
+						bw.close();
+						currentHand(l.get(name-1));
 							
-						}
+					}
+					if(halter.size()>0) {
+						this.stopRunning();
+					}
+				}
 			}
+				
 						
+			}
 			}catch(Exception e) {}
 		
-	}
+			}
 	
-
 }
+
