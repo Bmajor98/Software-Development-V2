@@ -1,6 +1,16 @@
-player 1 initial hand  2 1 1 1
-player 1 draws a 1 from deck 1
+player 1 initial hand  4 3 2 4
+player 1 draws a 2 from deck 1
 player 1 discards a 2 to deck 2
-player 1 current hand  1 1 1 1
+player 1 current hand  4 3 4 2
 
-player 1 draws a 1 from deck 1
+player 1 draws a 4 from deck 1
+player 1 discards a 3 to deck 2
+player 1 current hand  4 4 2 4
+
+player 1 draws a 2 from deck 1
+player 1 discards a 4 to deck 2
+player 1 current hand  4 2 4 2
+
+player 1 draws a 3 from deck 1
+player 1 discards a 2 to deck 2
+player 1 current hand  4 4 2 3
