@@ -91,45 +91,19 @@ public class CardGame {
 		Pack.checkPack(n);
 		Pack pack = GeneratePack(n);
 		List<DeckPlayer> l =Collections.synchronizedList( deal(n, pack));
-			
-	
-		
-		for(DeckPlayer p: l) {
-			System.out.println();
-			System.out.print("PLAYER "+p.name+": ");
-			for(Card c:p.playerCards) {
-				System.out.print(" "+c.val+",");
-				
-		
+		List<Boolean> booList = new ArrayList<Boolean>();
+		List<Thread> threadList = new ArrayList<Thread>();
+		for(int i = 1;i<=n;i++) {
+			Thread thready = new Thread(new CardThread(i,l,booList));
+			threadList.add(thready);
 			}
-			System.out.print("\n"+"Deck "+p.name+": ");
-			for(Card c:p.deckCards) {
-				System.out.print(" "+c.val+",");
-				
 		
-			}
-		}
-		Thread t1 = new Thread(new CardThread(1,l));
-		Thread t2 = new Thread(new CardThread(2,l));
-		Thread t3 = new Thread(new CardThread(3,l));
-		Thread t4 = new Thread(new CardThread(4,l));
-		
-		t1.start();
-		t2.start();
-		t3.start();
-		t4.start();
-//		
-//	public static boolean Check(Player player) {
-//		List<Integer> hand = new ArrayList<Integer>();
-//		for(Card card: player.cards) {
-//			hand.add(card.val);
-//		}		
-//		Stream<Integer> values = hand.stream();
-//		if(values.distinct().count() ==1) {
-//			return true;
-//		}
-//		return false;
-//			
 
+		for(Thread t: threadList) {
+			t.start();
 		}
 	}
+}
+
+
+

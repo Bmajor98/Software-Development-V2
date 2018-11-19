@@ -7,19 +7,25 @@ import java.util.*;
 public class CardThread implements Runnable {
 	int name;
 	volatile List<DeckPlayer> l = new ArrayList<DeckPlayer>();
+	List<Boolean> halter = new ArrayList<Boolean>();
+	private volatile boolean flag = true;
 	
-	CardThread(int name,List<DeckPlayer> l){
+	CardThread(int name,List<DeckPlayer> l,List<Boolean> halter){
 		this.name = name;
 		this.l = l;
+		this.halter = halter;
 	}
 	
 	public static List<DeckPlayer> draw(int name, List<DeckPlayer> deckPlayers) {
 		int listIndex = name -1;
 		DeckPlayer drawPlayer = deckPlayers.get(listIndex);
 		Card topDeck = deckPlayers.get(listIndex).deckCards.get(0);
-		drawPlayer.playerCards.add(topDeck);
-		drawPlayer.deckCards.remove(0);
-		deckPlayers.set(listIndex, drawPlayer);	
+		if(topDeck != null) {
+			
+			drawPlayer.playerCards.add(topDeck);
+			drawPlayer.deckCards.remove(0);
+			deckPlayers.set(listIndex, drawPlayer);	
+		}
 		
 		String filename = "player_"+name+".txt";
 		try {
@@ -37,8 +43,8 @@ public class CardThread implements Runnable {
 		}
 		
 		return deckPlayers;
-
-	}
+		}
+	
 	
 	public static List<DeckPlayer> discard(int name, List<DeckPlayer> deckPlayers) {
 		int listIndex = name -1;
@@ -66,7 +72,8 @@ public class CardThread implements Runnable {
 		} else {
 			DeckPlayer gainCard = deckPlayers.get(listIndex + 1);
 			gainCard.deckCards.add(discardCard);
-			deckPlayers.set(listIndex +1, gainCard);		
+			deckPlayers.set(listIndex +1, gainCard);	
+
 		}
 		
 		String filename  = "player_"+name+".txt";
@@ -89,7 +96,7 @@ public class CardThread implements Runnable {
 		} catch(IOException e) {}
 		return deckPlayers;
 	}
-	public static  void currentHand(DeckPlayer dP){
+	public synchronized static  void currentHand(DeckPlayer dP){
 		String filename = "player_"+dP.name+".txt";
 		try {
 			FileWriter fw = new FileWriter(filename, true);
@@ -118,24 +125,35 @@ public class CardThread implements Runnable {
 		List<Card> hand = dP.get(name-1).playerCards;
 		boolean allEqual = hand.stream().distinct().limit(2).count() <= 1;
 		return allEqual;
-		
-	}
-		
-		
+		}
 	
+	public void stopRunning() {
+		flag = false;
+	}
+
 
 	public void run(){
 		try {		
-			synchronized(l){
-				for(int i =0; i < 1000; i++) {
+			synchronized(l) {
+			
+				while(!check(name,l)) {
+				for(int i = 1; i<=10;i++) {
 					turn(name,l);
-							
-						}
+					check(name,l);
+					if(check(name,l)) {
+						halter.add(true);		
+					}
+					if(halter.size()>0) {
+						this.stopRunning();
+					}
+				}
 			}
+				
 						
+			}
 			}catch(Exception e) {}
 		
-	}
+			}
 	
-
 }
+
