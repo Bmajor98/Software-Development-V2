@@ -1,5 +1,8 @@
+/**
+ * This class defines the Pack object and contains the method for checking 
+ * a pack is valid.
+ */
 package game;
-
 import java.io.File;
 import java.util.*;
 
@@ -45,24 +48,6 @@ public class Pack {
 	
 	}
 }	
-	
-//	public static CardsPack Generate(int n, Pack pack){
-//		List<List<Card>> cards = new ArrayList<List<Card>>();
-//		for(int i = 1; i <= n; i++) {
-//			List<Card>  c = new ArrayList<Card>();
-//			cards.add(c);
-//		}
-//		
-//		for(int i = 1; i <= n; i++) {
-//			for(List<Card> l : cards) {
-//				Card top = pack.cards.get(0);
-//				l.add(top);
-//				pack.cards.remove(0);
-//			}
-//		}
-//		CardsPack cardsPack = new CardsPack(cards,pack);
-//		return cardsPack;
-//	}
-		
+
 
 

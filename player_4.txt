@@ -1,1 +1,1 @@
-player 4 initial hand  4 1 4 3
+player 4 initial hand  4 4 4 4
