@@ -118,7 +118,7 @@ public class CardGame {
 		t2.start();
 		t3.start();
 		t4.start();
-		
+//		
 //	public static boolean Check(Player player) {
 //		List<Integer> hand = new ArrayList<Integer>();
 //		for(Card card: player.cards) {

@@ -107,25 +107,33 @@ public class CardThread implements Runnable {
 		}catch(IOException e){}
 	}
 	
-	 private  static List<DeckPlayer> turn(int name, List<DeckPlayer> deckPlayers) {
+	 private  static  List<DeckPlayer> turn(int name, List<DeckPlayer> deckPlayers) {
 		deckPlayers = draw(name, deckPlayers);
 		deckPlayers = discard(name,deckPlayers);
 		currentHand(deckPlayers.get(name-1));
 		return deckPlayers;
+	 }
+	synchronized public static boolean check(int name,List<DeckPlayer> dP) {
 		
+		List<Card> hand = dP.get(name-1).playerCards;
+		boolean allEqual = hand.stream().distinct().limit(2).count() <= 1;
+		return allEqual;
 		
 	}
+		
+		
+	
 
 	public void run(){
 		try {		
-				
-					for(int i =0; i<=5; i++) {
-						synchronized(l){turn(name,l);}
+			synchronized(l){
+				for(int i =0; i < 1000; i++) {
+					turn(name,l);
+							
+						}
+			}
 						
-					}
-				
-		
-		}catch(Exception e) {}
+			}catch(Exception e) {}
 		
 	}
 	
